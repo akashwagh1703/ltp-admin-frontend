@@ -10,7 +10,12 @@ export const endpoints = {
     approve: (id) => `/v1/admin/turfs/${id}/approve`,
     reject: (id) => `/v1/admin/turfs/${id}/reject`,
     suspend: (id) => `/v1/admin/turfs/${id}/suspend`,
-    activate: (id) => `/v1/admin/turfs/${id}/activate`
+    activate: (id) => `/v1/admin/turfs/${id}/activate`,
+    uploadImages: (id) => `/v1/admin/turfs/${id}/images`
+  },
+  turfImages: {
+    delete: (id) => `/v1/admin/turf-images/${id}`,
+    setPrimary: (id) => `/v1/admin/turf-images/${id}/set-primary`
   },
   owners: {
     list: '/v1/admin/owners',
@@ -29,7 +34,6 @@ export const endpoints = {
   },
   payouts: {
     list: '/v1/admin/payouts',
-    detail: (id) => `/v1/admin/payouts/${id}`,
     generate: '/v1/admin/payouts/generate',
     process: (id) => `/v1/admin/payouts/${id}/process`,
     release: (id) => `/v1/admin/payouts/${id}/release`
