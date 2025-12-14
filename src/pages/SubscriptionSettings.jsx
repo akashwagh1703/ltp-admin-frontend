@@ -77,21 +77,28 @@ export default function SubscriptionSettings() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Price (₹)
                   </label>
-                  <div className="flex gap-2">
-                    <Input
-                      type="number"
-                      value={plan.price}
-                      onChange={(e) => handlePriceChange(plan.id, e.target.value)}
-                      min="0"
-                      step="0.01"
-                    />
-                    <Button
-                      onClick={() => handleSave(plan)}
-                      disabled={saving}
-                    >
-                      Save
-                    </Button>
-                  </div>
+                  {plan.name === 'Free Plan' ? (
+                    <div className="flex items-center gap-2">
+                      <p className="text-gray-900 font-semibold">₹{plan.price}</p>
+                      <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">FREE</span>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Input
+                        type="number"
+                        value={plan.price}
+                        onChange={(e) => handlePriceChange(plan.id, e.target.value)}
+                        min="0"
+                        step="0.01"
+                      />
+                      <Button
+                        onClick={() => handleSave(plan)}
+                        disabled={saving}
+                      >
+                        Save
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -102,6 +109,8 @@ export default function SubscriptionSettings() {
       <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
         <h4 className="font-semibold text-blue-900 mb-2">Important Notes:</h4>
         <ul className="list-disc list-inside text-sm text-blue-800 space-y-1">
+          <li>Free Plan is automatically assigned to new owners upon registration</li>
+          <li>Free Plan price cannot be modified (always ₹0)</li>
           <li>Price changes will apply to new subscriptions only</li>
           <li>Existing subscriptions will not be affected</li>
           <li>Prices are in Indian Rupees (₹)</li>

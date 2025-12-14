@@ -47,7 +47,22 @@ export default function TurfForm({ initialData, onSubmit, loading }) {
 
   const handleImageAdd = (e) => {
     const files = Array.from(e.target.files)
-    const newImages = files.map(file => ({
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif']
+    const maxSize = 5 * 1024 * 1024 // 5MB
+    
+    const validFiles = files.filter(file => {
+      if (!validTypes.includes(file.type)) {
+        alert(`${file.name}: Only JPG, JPEG, PNG, and GIF images are allowed`)
+        return false
+      }
+      if (file.size > maxSize) {
+        alert(`${file.name}: Image size must not exceed 5MB`)
+        return false
+      }
+      return true
+    })
+    
+    const newImages = validFiles.map(file => ({
       name: file.name,
       url: URL.createObjectURL(file),
       file
@@ -131,7 +146,10 @@ export default function TurfForm({ initialData, onSubmit, loading }) {
         label="Sport Type"
         value={sportType}
         onChange={(value) => setValue('sport_type', value)}
-        options={SPORT_TYPES.map(sport => ({ value: sport, label: sport }))}
+        options={SPORT_TYPES.map(sport => ({ 
+          value: sport, 
+          label: sport.charAt(0).toUpperCase() + sport.slice(1) 
+        }))}
         error={errors.sport_type?.message}
       />
 
@@ -205,10 +223,11 @@ export default function TurfForm({ initialData, onSubmit, loading }) {
         <input
           type="file"
           multiple
-          accept="image/*"
+          accept="image/jpeg,image/jpg,image/png,image/gif"
           onChange={handleImageAdd}
           className="w-full px-4 py-2 border rounded-lg"
         />
+        <p className="text-xs text-gray-500 mt-1">Allowed: JPG, JPEG, PNG, GIF (Max 5MB each)</p>
         {images.length > 0 && (
           <div className="grid grid-cols-3 gap-2 mt-3">
             {images.map((img, idx) => (

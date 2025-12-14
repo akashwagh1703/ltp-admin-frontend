@@ -7,7 +7,7 @@ import ConfirmDialog from '../components/ui/ConfirmDialog'
 import Modal from '../components/ui/Modal'
 import TurfForm from '../components/forms/TurfForm'
 import { useTurfs, useApproveTurf, useRejectTurf, useSuspendTurf, useActivateTurf, useDeleteTurf } from '../api/hooks/useTurfs'
-import { formatCurrency, formatDateTime } from '../utils/formatters'
+import { formatCurrency, formatDateTime, formatSportType } from '../utils/formatters'
 import { STATUS_COLORS } from '../utils/constants'
 import toast from 'react-hot-toast'
 
@@ -55,7 +55,12 @@ export default function Turfs() {
   const columns = [
     { key: 'id', label: 'ID', sortable: true },
     { key: 'name', label: 'Name', sortable: true },
-    { key: 'sport_type', label: 'Sport', sortable: true },
+    { 
+      key: 'sport_type', 
+      label: 'Sport', 
+      sortable: true,
+      render: (row) => formatSportType(row.sport_type)
+    },
     { 
       key: 'city', 
       label: 'City',
@@ -184,7 +189,7 @@ export default function Turfs() {
               </div>
               <div>
                 <p className="text-sm text-gray-600">Sport Type</p>
-                <p className="font-medium">{selectedTurf.sport_type}</p>
+                <p className="font-medium">{formatSportType(selectedTurf.sport_type)}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-600">Price</p>

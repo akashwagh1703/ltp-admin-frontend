@@ -1,11 +1,9 @@
-import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import Input from '../ui/Input'
 import Button from '../ui/Button'
 import { phoneSchema, emailSchema } from '../../utils/validators'
-import { subscriptionService } from '../../services/subscriptionService'
 
 const createOwnerSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters'),
@@ -16,10 +14,7 @@ const createOwnerSchema = z.object({
   bank_name: z.string().optional(),
   account_number: z.string().regex(/^\d{9,18}$/, 'Account number must be 9-18 digits').optional().or(z.literal('')),
   ifsc_code: z.string().regex(/^[A-Z]{4}0[A-Z0-9]{6}$/, 'Invalid IFSC code').optional().or(z.literal('')),
-  account_holder_name: z.string().optional(),
-  subscription_plan_id: z.string().min(1, 'Please select a subscription plan'),
-  payment_method: z.string().min(1, 'Payment method is required'),
-  transaction_id: z.string().optional()
+  account_holder_name: z.string().optional()
 })
 
 const editOwnerSchema = z.object({
@@ -35,35 +30,10 @@ const editOwnerSchema = z.object({
 })
 
 export default function OwnerForm({ initialData, onSubmit, loading }) {
-  const [plans, setPlans] = useState([])
-  const [selectedPlan, setSelectedPlan] = useState(null)
-  
-  const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm({
+  const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(initialData ? editOwnerSchema : createOwnerSchema),
-    defaultValues: initialData || { payment_method: 'cash' }
+    defaultValues: initialData || {}
   })
-
-  const planId = watch('subscription_plan_id')
-
-  useEffect(() => {
-    loadPlans()
-  }, [])
-
-  useEffect(() => {
-    if (planId) {
-      const plan = plans.find(p => p.id.toString() === planId)
-      setSelectedPlan(plan)
-    }
-  }, [planId, plans])
-
-  const loadPlans = async () => {
-    try {
-      const response = await subscriptionService.getPlans()
-      setPlans(response.data)
-    } catch (error) {
-      console.error('Error loading plans:', error)
-    }
-  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 max-h-[70vh] overflow-y-auto px-1">
@@ -156,65 +126,17 @@ export default function OwnerForm({ initialData, onSubmit, loading }) {
       />
 
       {!initialData && (
-        <>
-          <div className="bg-purple-50 p-3 rounded-lg mb-4 mt-6">
-            <h4 className="font-semibold text-sm text-gray-900 mb-1">Subscription & Payment</h4>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Subscription Plan
-            </label>
-            <select
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              {...register('subscription_plan_id')}
-            >
-              <option value="">Select Plan</option>
-              {plans.map(plan => (
-                <option key={plan.id} value={plan.id}>
-                  {plan.name} - ₹{plan.price} ({plan.duration_days} days)
-                </option>
-              ))}
-            </select>
-            {errors.subscription_plan_id && (
-              <p className="mt-1 text-sm text-red-600">{errors.subscription_plan_id.message}</p>
-            )}
-          </div>
-
-          {selectedPlan && (
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <p className="text-sm font-medium text-gray-900">Plan Details:</p>
-              <p className="text-sm text-gray-700">Type: {selectedPlan.type}</p>
-              <p className="text-sm text-gray-700">Duration: {selectedPlan.duration_days} days</p>
-              <p className="text-lg font-bold text-blue-600 mt-2">Amount: ₹{selectedPlan.price}</p>
+        <div className="bg-green-50 p-4 rounded-lg mb-4 mt-6">
+          <div className="flex items-center gap-2">
+            <svg className="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <h4 className="font-semibold text-sm text-gray-900">Free Subscription Included</h4>
+              <p className="text-xs text-gray-700 mt-1">New owners automatically get a 90-day free subscription plan</p>
             </div>
-          )}
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Payment Method
-            </label>
-            <select
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              {...register('payment_method')}
-            >
-              <option value="cash">Cash</option>
-              <option value="online">Online</option>
-              <option value="bank_transfer">Bank Transfer</option>
-              <option value="cheque">Cheque</option>
-            </select>
-            {errors.payment_method && (
-              <p className="mt-1 text-sm text-red-600">{errors.payment_method.message}</p>
-            )}
           </div>
-
-          <Input
-            label="Transaction ID (Optional)"
-            placeholder="Enter transaction/reference ID"
-            error={errors.transaction_id?.message}
-            {...register('transaction_id')}
-          />
-        </>
+        </div>
       )}
 
       <div className="flex gap-3 pt-4 sticky bottom-0 bg-white pb-2">

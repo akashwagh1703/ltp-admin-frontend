@@ -16,12 +16,12 @@ export const PAYOUT_STATUS = {
 }
 
 export const SPORT_TYPES = [
-  'Cricket',
-  'Football',
-  'Badminton',
-  'Tennis',
-  'Basketball',
-  'Volleyball'
+  'cricket',
+  'football',
+  'badminton',
+  'tennis',
+  'basketball',
+  'volleyball'
 ]
 
 export const PAYMENT_MODES = [

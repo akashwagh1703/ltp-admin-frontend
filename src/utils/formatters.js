@@ -29,3 +29,8 @@ export const truncateText = (text, length = 50) => {
   if (!text) return ''
   return text.length > length ? `${text.substring(0, length)}...` : text
 }
+
+export const formatSportType = (sportType) => {
+  if (!sportType) return ''
+  return sportType.charAt(0).toUpperCase() + sportType.slice(1).toLowerCase()
+}

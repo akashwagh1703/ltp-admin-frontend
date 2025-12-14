@@ -34,18 +34,42 @@ export default function TurfImages() {
     const files = Array.from(e.target.files)
     if (files.length === 0) return
 
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif']
+    const maxSize = 5 * 1024 * 1024 // 5MB
+    
+    const validFiles = files.filter(file => {
+      if (!validTypes.includes(file.type)) {
+        toast.error(`${file.name}: Only JPG, JPEG, PNG, and GIF images are allowed`)
+        return false
+      }
+      if (file.size > maxSize) {
+        toast.error(`${file.name}: Image size must not exceed 5MB`)
+        return false
+      }
+      return true
+    })
+
+    if (validFiles.length === 0) return
+
     setUploading(true)
     const formData = new FormData()
-    files.forEach(file => {
+    
+    // Append files with simple array notation
+    validFiles.forEach(file => {
       formData.append('images[]', file)
     })
 
+    console.log('📤 Uploading files:', validFiles.map(f => ({ name: f.name, size: f.size, type: f.type })))
+
     try {
-      await turfImageService.upload(id, formData)
+      const result = await turfImageService.upload(id, formData)
+      console.log('✅ Upload success:', result)
       toast.success('Images uploaded successfully')
+      e.target.value = '' // Reset file input
       loadTurf()
     } catch (error) {
-      toast.error('Failed to upload images')
+      console.error('❌ Upload error:', error)
+      toast.error(error.response?.data?.message || 'Failed to upload images')
     } finally {
       setUploading(false)
     }
@@ -94,11 +118,11 @@ export default function TurfImages() {
           <label className="block w-full border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-primary transition-colors">
             <Upload className="h-12 w-12 mx-auto text-gray-400 mb-3" />
             <p className="text-lg text-gray-600 mb-1">Click to upload images</p>
-            <p className="text-sm text-gray-500">PNG, JPG up to 5MB each</p>
+            <p className="text-sm text-gray-500">JPG, JPEG, PNG, GIF up to 5MB each</p>
             <input
               type="file"
               multiple
-              accept="image/*"
+              accept="image/jpeg,image/jpg,image/png,image/gif"
               onChange={handleImageUpload}
               className="hidden"
               disabled={uploading}

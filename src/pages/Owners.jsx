@@ -37,21 +37,9 @@ export default function Owners() {
 
   const handleAdd = async (data) => {
     try {
-      const { subscription_plan_id, payment_method, transaction_id, ...ownerData } = data
-      
-      const ownerResponse = await ownerService.create(ownerData)
-      const ownerId = ownerResponse.data.data?.id || ownerResponse.data.id
-      
-      await subscriptionService.create({
-        owner_id: ownerId,
-        plan_id: subscription_plan_id,
-        start_date: new Date().toISOString().split('T')[0],
-        amount_paid: 0,
-        payment_method,
-        transaction_id
-      })
-      
-      toast.success('Owner added successfully')
+      // Backend automatically assigns free subscription
+      await ownerService.create(data)
+      toast.success('Owner added successfully with free subscription')
       setShowAddModal(false)
       fetchOwners()
     } catch (error) {
