@@ -21,9 +21,12 @@ export default function TurfImages() {
   const loadTurf = async () => {
     try {
       const response = await turfService.getById(id)
+      console.log('Turf data:', response.data)
+      console.log('Images:', response.data.images)
       setTurf(response.data)
       setImages(response.data.images || [])
     } catch (error) {
+      console.error('Load turf error:', error)
       toast.error('Failed to load turf')
     } finally {
       setLoading(false)
@@ -146,12 +149,19 @@ export default function TurfImages() {
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {images.map((img) => (
+            {images.map((img) => {
+              const imagePath = img.image_path ? encodeURI(img.image_path) : ''
+              const imageUrl = img.image_url || `http://35.222.74.225/storage/${imagePath}`
+              console.log('Image URL:', imageUrl, 'Image object:', img)
+              return (
               <div key={img.id} className="relative group">
                 <img
-                  src={`http://localhost:8000/storage/${img.image_path}`}
+                  src={imageUrl}
                   alt="Turf"
                   className="w-full h-48 object-cover rounded-lg"
+                  onError={(e) => {
+                    console.error('Image load failed:', imageUrl)
+                  }}
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all rounded-lg flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
                   <button
@@ -177,7 +187,7 @@ export default function TurfImages() {
                   </div>
                 )}
               </div>
-            ))}
+            )})}
           </div>
         )}
       </div>
